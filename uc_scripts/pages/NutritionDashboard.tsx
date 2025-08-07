@@ -1,5 +1,5 @@
 import React from 'react';
-import { User } from '../../types/auth';
+import { User } from '../types/auth';
 
 interface NutritionDashboardProps {
   currentUser: User;

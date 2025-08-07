@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User } from '../../types/auth';
+import { User } from '../types/auth';
 import { Play, Pause, Heart, Zap, Clock, MapPin, TrendingUp, Calendar, Filter } from 'lucide-react';
 
 interface WorkoutDashboardProps {

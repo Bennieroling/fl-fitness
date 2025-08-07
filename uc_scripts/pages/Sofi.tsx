@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, Target, X } from 'lucide-react';
-import MainLayout from '../components/layout/MainLayout';
 import { User } from '../types/auth';
 import LoginForm from '../components/auth/LoginForm';
 
@@ -65,7 +64,7 @@ const SofiPage: React.FC<SofiPageProps> = ({
   }
 
   if (!currentUser) {
-    return <LoginForm onLogin={() => {}} users={users} />;
+return <LoginForm onLogin={() => {}} />;
   }
 
   return (

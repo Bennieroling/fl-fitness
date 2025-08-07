@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User } from '../../types/auth';
+import { User } from '../types/auth';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 
 interface ProfileDashboardProps {
