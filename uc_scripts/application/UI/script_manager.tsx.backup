@@ -1,0 +1,707 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Play, 
+  Square, 
+  Settings, 
+  Users, 
+  LogOut, 
+  Eye, 
+  EyeOff, 
+  Shield, 
+  Terminal, 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
+  AlertCircle,
+  Download,
+  File,
+  Folder,
+  RefreshCw
+} from 'lucide-react';
+
+// Type definitions
+interface User {
+  id: number;
+  username: string;
+  role: string;
+  permissions: string[];
+}
+
+interface Script {
+  id: number;
+  name: string;
+  file: string;
+  description: string;
+  category: string;
+}
+
+interface FileInfo {
+  name: string;
+  path: string;
+  size: number;
+  modified: string;
+  type: string;
+  relative_path?: string;
+}
+
+interface LogEntry {
+  timestamp: string;
+  status: 'success' | 'error' | 'warning';
+  message: string;
+  files?: FileInfo[];
+}
+
+interface ScriptLogs {
+  [scriptId: number]: LogEntry[];
+}
+
+interface RunningScripts {
+  [scriptId: number]: boolean;
+}
+
+interface ScriptFiles {
+  [scriptId: number]: FileInfo[];
+}
+
+// API base URL - adjust for your server
+const API_BASE_URL = 'http://localhost:8000';
+
+const ScriptManagerUI: React.FC = () => {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('scripts');
+  const [runningScripts, setRunningScripts] = useState<RunningScripts>({});
+  const [scriptLogs, setScriptLogs] = useState<ScriptLogs>({});
+  const [scriptFiles, setScriptFiles] = useState<ScriptFiles>({});
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [scripts, setScripts] = useState<Script[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // Mock users - replace with real authentication
+  const [users] = useState<User[]>([
+    { id: 1, username: 'admin', role: 'admin', permissions: ['scripts', 'users', 'logs'] },
+    { id: 2, username: 'developer', role: 'developer', permissions: ['scripts', 'logs'] },
+    { id: 3, username: 'viewer', role: 'viewer', permissions: ['logs'] }
+  ]);
+
+  // Mock scripts as fallback if API is not available
+  const mockScripts = [
+    { 
+      id: 1, 
+      name: 'Proton Phone Numbers', 
+      file: 'proton_ui.py',
+      description: 'Fetch phone numbers from Proton API', 
+      category: 'Data Collection'
+    },
+    { 
+      id: 2, 
+      name: 'Log Cleanup', 
+      file: 'cleanup.sh',
+      description: 'Clean old log files', 
+      category: 'Maintenance'
+    },
+    { 
+      id: 3, 
+      name: 'System Health Check', 
+      file: 'health_check.py',
+      description: 'Check system health and generate report', 
+      category: 'Monitoring'
+    }
+  ];
+
+  // Fetch scripts from API on component mount
+  useEffect(() => {
+    fetchScripts();
+  }, []);
+
+  // Poll for script status and files when logged in
+  useEffect(() => {
+    if (currentUser) {
+      const interval = setInterval(() => {
+        fetchScriptFiles();
+      }, 5000); // Update every 5 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [currentUser]);
+
+  const fetchScripts = async () => {
+    try {
+      console.log('Fetching scripts from:', `${API_BASE_URL}/api/scripts`);
+      const response = await fetch(`${API_BASE_URL}/api/scripts`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Fetched scripts:', data);
+      setScripts(data.scripts || []);
+    } catch (error) {
+      console.error('Failed to fetch scripts from API, using mock data:', error);
+      // Use mock scripts as fallback
+      setScripts(mockScripts);
+    }
+  };
+
+  const fetchScriptFiles = async () => {
+    if (!currentUser) return;
+
+    for (const script of scripts) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/files/${currentUser.username}?script_id=${script.id}`);
+        const data = await response.json();
+        setScriptFiles(prev => ({
+          ...prev,
+          [script.id]: data.files || []
+        }));
+      } catch (error) {
+        console.error(`Failed to fetch files for script ${script.id}:`, error);
+      }
+    }
+  };
+
+  const handleLogin = (): void => {
+    const usernameElement = document.getElementById('username') as HTMLInputElement;
+    const passwordElement = document.getElementById('password') as HTMLInputElement;
+    
+    if (!usernameElement || !passwordElement) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const username = usernameElement.value;
+    const password = passwordElement.value;
+    
+    const user = users.find(u => u.username === username);
+    if (user && password === 'password123') {
+      setCurrentUser(user);
+      fetchScriptFiles();
+    } else {
+      alert('Invalid credentials');
+    }
+  };
+
+  const handleLogout = (): void => {
+    setCurrentUser(null);
+    setActiveTab('scripts');
+    setRunningScripts({});
+    setScriptFiles({});
+  };
+
+  const canAccess = (permission: string): boolean => {
+    return currentUser !== null && currentUser.permissions.includes(permission);
+  };
+
+  const runScript = async (scriptId: number): Promise<void> => {
+    if (!currentUser) return;
+
+    setRunningScripts(prev => ({ ...prev, [scriptId]: true }));
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/scripts/${scriptId}/run`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: currentUser.username,
+          requester: currentUser.username,
+          output_prefix: `Script_${scriptId}`
+        })
+      });
+
+      const result = await response.json();
+      
+      setRunningScripts(prev => ({ ...prev, [scriptId]: false }));
+      
+      // Update logs
+      const script = scripts.find(s => s.id === scriptId);
+      const logEntry: LogEntry = {
+        timestamp: new Date().toLocaleString(),
+        status: result.status === 'success' ? 'success' : 'error',
+        message: result.message,
+        files: result.files || []
+      };
+
+      setScriptLogs(prev => ({
+        ...prev,
+        [scriptId]: [...(prev[scriptId] || []), logEntry]
+      }));
+
+      // Update files
+      if (result.files) {
+        setScriptFiles(prev => ({
+          ...prev,
+          [scriptId]: result.files
+        }));
+      }
+
+    } catch (error) {
+      setRunningScripts(prev => ({ ...prev, [scriptId]: false }));
+      console.error('Script execution failed:', error);
+      
+      const logEntry: LogEntry = {
+        timestamp: new Date().toLocaleString(),
+        status: 'error',
+        message: `Script execution failed: ${error}`
+      };
+
+      setScriptLogs(prev => ({
+        ...prev,
+        [scriptId]: [...(prev[scriptId] || []), logEntry]
+      }));
+    }
+  };
+
+  const stopScript = async (scriptId: number): Promise<void> => {
+    if (!currentUser) return;
+
+    try {
+      await fetch(`${API_BASE_URL}/api/scripts/${scriptId}/stop`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: currentUser.username
+        })
+      });
+
+      setRunningScripts(prev => ({ ...prev, [scriptId]: false }));
+      
+      const script = scripts.find(s => s.id === scriptId);
+      const logEntry: LogEntry = {
+        timestamp: new Date().toLocaleString(),
+        status: 'warning',
+        message: `${script?.name} stopped by user`
+      };
+
+      setScriptLogs(prev => ({
+        ...prev,
+        [scriptId]: [...(prev[scriptId] || []), logEntry]
+      }));
+
+    } catch (error) {
+      console.error('Failed to stop script:', error);
+    }
+  };
+
+  const downloadFile = async (fileName: string, relativePath: string) => {
+    if (!currentUser) return;
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/files/${currentUser.username}/download?file_path=${encodeURIComponent(relativePath)}`
+      );
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        alert('Failed to download file');
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Download failed');
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const getStatusIcon = (status: string): JSX.Element => {
+    switch (status) {
+      case 'success': return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'error': return <XCircle className="w-4 h-4 text-red-500" />;
+      case 'warning': return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+      default: return <Clock className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent): void => {
+    if (event.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-8 h-8 text-blue-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Script Manager</h1>
+            <p className="text-gray-600 mt-2">Sign in to manage server scripts</p>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+              <input
+                type="text"
+                id="username"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Enter your username"
+                onKeyPress={handleKeyPress}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-12"
+                  placeholder="Enter your password"
+                  onKeyPress={handleKeyPress}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+            
+            <button
+              onClick={handleLogin}
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Sign In
+            </button>
+          </div>
+          
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600 mb-2">Demo credentials:</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <div>admin / password123 (full access)</div>
+              <div>developer / password123 (scripts + logs)</div>
+              <div>viewer / password123 (logs only)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-3">
+              <div className="bg-blue-100 w-10 h-10 rounded-lg flex items-center justify-center">
+                <Terminal className="w-6 h-6 text-blue-600" />
+              </div>
+              <h1 className="text-xl font-semibold text-gray-900">Script Manager</h1>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={fetchScriptFiles}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Refresh files"
+              >
+                <RefreshCw className="w-5 h-5" />
+              </button>
+              <div className="flex items-center space-x-2 px-3 py-1 bg-gray-100 rounded-full">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-gray-700">{currentUser.username}</span>
+                <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">{currentUser.role}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Navigation Tabs */}
+        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-8 w-fit">
+          {canAccess('scripts') && (
+            <button
+              onClick={() => setActiveTab('scripts')}
+              className={`px-6 py-2 rounded-md font-medium transition-colors ${
+                activeTab === 'scripts'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              Scripts
+            </button>
+          )}
+          {canAccess('logs') && (
+            <button
+              onClick={() => setActiveTab('logs')}
+              className={`px-6 py-2 rounded-md font-medium transition-colors ${
+                activeTab === 'logs'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              Logs
+            </button>
+          )}
+          {canAccess('users') && (
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`px-6 py-2 rounded-md font-medium transition-colors ${
+                activeTab === 'users'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              Users
+            </button>
+          )}
+        </div>
+
+        {/* Scripts Tab */}
+        {activeTab === 'scripts' && canAccess('scripts') && (
+          <div>
+            {/* Debug info */}
+            {scripts.length === 0 && (
+              <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  No scripts loaded. Check console for errors or verify API server is running at {API_BASE_URL}
+                </p>
+              </div>
+            )}
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {scripts.map(script => (
+                <div key={script.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">{script.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{script.description}</p>
+                      <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                        {script.category}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <code className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">
+                      {script.file}
+                    </code>
+                    
+                    <div className="flex space-x-2">
+                      {runningScripts[script.id] ? (
+                        <button
+                          onClick={() => stopScript(script.id)}
+                          className="flex items-center space-x-1 px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm"
+                        >
+                          <Square className="w-4 h-4" />
+                          <span>Stop</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => runScript(script.id)}
+                          className="flex items-center space-x-1 px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm"
+                        >
+                          <Play className="w-4 h-4" />
+                          <span>Run</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {runningScripts[script.id] && (
+                    <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-sm text-blue-700">Script is running...</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Generated Files Section */}
+                  {scriptFiles[script.id] && scriptFiles[script.id].length > 0 && (
+                    <div className="border-t border-gray-200 pt-4">
+                      <div className="flex items-center space-x-2 mb-3">
+                        <Folder className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-700">Generated Files</span>
+                      </div>
+                      <div className="space-y-2 max-h-32 overflow-y-auto">
+                        {scriptFiles[script.id].slice(0, 5).map((file, index) => (
+                          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <div className="flex items-center space-x-2 flex-1 min-w-0">
+                              <File className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-medium text-gray-900 truncate">{file.name}</p>
+                                <p className="text-xs text-gray-500">
+                                  {formatFileSize(file.size)} • {new Date(file.modified).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => downloadFile(file.name, file.relative_path || file.name)}
+                              className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded transition-colors"
+                              title="Download file"
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        {scriptFiles[script.id].length > 5 && (
+                          <p className="text-xs text-gray-500 text-center py-1">
+                            +{scriptFiles[script.id].length - 5} more files
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Logs Tab */}
+        {activeTab === 'logs' && canAccess('logs') && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Script Execution Logs</h2>
+            </div>
+            <div className="p-6">
+              {Object.keys(scriptLogs).length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Terminal className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <p>No logs available. Run some scripts to see execution history.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {Object.entries(scriptLogs).map(([scriptId, logs]) => {
+                    const script = scripts.find(s => s.id === parseInt(scriptId));
+                    const typedLogs = logs as LogEntry[];
+                    return (
+                      <div key={scriptId} className="border border-gray-200 rounded-lg">
+                        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                          <h3 className="font-medium text-gray-900">{script?.name}</h3>
+                        </div>
+                        <div className="p-4 space-y-3">
+                          {typedLogs.slice(-5).map((log, index) => (
+                            <div key={index} className="space-y-2">
+                              <div className="flex items-start space-x-3 text-sm">
+                                {getStatusIcon(log.status)}
+                                <div className="flex-1">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-gray-900">{log.message}</span>
+                                  </div>
+                                  <span className="text-gray-500 text-xs">{log.timestamp}</span>
+                                </div>
+                              </div>
+                              {log.files && log.files.length > 0 && (
+                                <div className="ml-7 p-2 bg-gray-50 rounded-lg">
+                                  <p className="text-xs font-medium text-gray-700 mb-2">Generated Files:</p>
+                                  <div className="space-y-1">
+                                    {log.files.map((file, fileIndex) => (
+                                      <div key={fileIndex} className="flex items-center justify-between">
+                                        <span className="text-xs text-gray-600">{file.name}</span>
+                                        <button
+                                          onClick={() => downloadFile(file.name, file.relative_path || file.name)}
+                                          className="text-xs text-blue-600 hover:text-blue-800"
+                                        >
+                                          Download
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === 'users' && canAccess('users') && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">User Management</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permissions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {users.map(user => (
+                    <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-blue-600">
+                              {user.username.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="ml-3">
+                            <div className="text-sm font-medium text-gray-900">{user.username}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                          user.role === 'developer' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {user.permissions.join(', ')}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
+                        <button className="text-red-600 hover:text-red-900">Remove</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ScriptManagerUI;

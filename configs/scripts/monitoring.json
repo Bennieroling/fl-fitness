@@ -1,0 +1,17 @@
+{
+  "category": "monitoring",
+  "scripts": [
+    {
+      "id": 5,
+      "name": "Telephony Status",
+      "file": "daily_summary_.sh",
+      "path": "/opt/telephony-monitoring/bin/daily_summary_.sh",
+      "interpreter": "bash",
+      "output_subdir": "output/telephony_status",
+      "description": "Generate telephony system health and issues report",
+      "enabled": true,
+      "auto_run": true,
+      "inputs": []
+    }
+  ]
+}

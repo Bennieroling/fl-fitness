@@ -1,0 +1,49 @@
+{
+  "categories": [
+    {
+      "id": "data-collection",
+      "name": "Data Collection",
+      "description": "Scripts for gathering and fetching data from various sources",
+      "icon": "database",
+      "color": "blue",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "monitoring",
+      "name": "Monitoring & Health",
+      "description": "System monitoring, health checks, and status reports",
+      "icon": "monitor",
+      "color": "green",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "reporting",
+      "name": "Reporting",
+      "description": "Generate reports and analytics from system data",
+      "icon": "file-text",
+      "color": "purple",
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "id": "maintenance",
+      "name": "Maintenance",
+      "description": "System cleanup, optimization, and maintenance tasks",
+      "icon": "wrench",
+      "color": "orange",
+      "enabled": true,
+      "order": 4
+    },
+    {
+      "id": "troubleshooting",
+      "name": "Troubleshooting",
+      "description": "Diagnostic tools and problem resolution scripts",
+      "icon": "alert-triangle",
+      "color": "red",
+      "enabled": true,
+      "order": 5
+    }
+  ]
+}

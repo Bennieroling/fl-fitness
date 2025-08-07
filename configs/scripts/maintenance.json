@@ -1,0 +1,17 @@
+{
+  "category": "maintenance",
+  "scripts": [
+    {
+      "id": 4,
+      "name": "System Maintenance",
+      "file": "placeholder.py",
+      "path": "/opt/telephony-monitoring/Placeholder.py",
+      "interpreter": "python3",
+      "output_subdir": "output/Placeholder",
+      "description": "Placeholder maintenance script",
+      "enabled": false,
+      "auto_run": false,
+      "inputs": []
+    }
+  ]
+}

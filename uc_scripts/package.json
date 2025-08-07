@@ -1,0 +1,38 @@
+{
+  "name": "script-manager-ui",
+  "version": "1.0.0",
+  "description": "React UI for managing server scripts",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next": "^13.5.0",
+    "lucide-react": "^0.263.1",
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.29"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.22",
+    "@types/react-dom": "^18.2.7",
+    "@types/node": "^20.6.0",
+    "typescript": "^5.2.2",
+    "eslint": "^8.49.0",
+    "eslint-config-next": "^13.5.0"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "script-manager",
+    "ui"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

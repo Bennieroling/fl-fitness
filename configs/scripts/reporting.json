@@ -1,0 +1,32 @@
+{
+  "category": "reporting",
+  "scripts": [
+    {
+      "id": 3,
+      "name": "Failed Calls$ Report",
+      "file": "get_failed_calls_scriptmanager.sh",
+      "path": "/opt/telephony-monitoring/bin/get_failed_calls_scriptmanager.sh",
+      "interpreter": "bash",
+      "output_subdir": "output/get_failed_calls_scriptmanager",
+      "description": "Get failed calls for a specific country and phone number",
+      "enabled": true,
+      "auto_run": false,
+      "inputs": [
+        {
+          "key": "COUNTRY",
+          "label": "Country",
+          "type": "dropdown",
+          "placeholder": "Enter$ country name",
+          "required": true
+        },
+        {
+          "key": "PHONE_NUMBER",
+          "label": "Phone Number",
+          "type": "text",
+          "placeholder": "Enter phone number",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+id,call_timestamp,caller_number,receiver_number,status,duration,error_code,created_at,country
+--,--------------,-------------,---------------,------,--------,----------,----------,-------

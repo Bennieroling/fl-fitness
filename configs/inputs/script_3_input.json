@@ -1,0 +1,16 @@
+[
+  {
+    "key": "COUNTRY",
+    "label": "Country",
+    "type": "text",
+    "placeholder": "Enter country name",
+    "required": true
+  },
+  {
+    "key": "PHONE_NUMBER",
+    "label": "Phone Number",
+    "type": "text",
+    "placeholder": "Enter phone number",
+    "required": false
+  }
+]

@@ -1,0 +1,71 @@
+import React from 'react';
+import { useRouter } from 'next/router';
+
+interface NavigationProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  canAccess: (permission: string) => boolean;
+}
+
+interface TabItem {
+  id: string;
+  label: string;
+  permission: string;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange, canAccess }) => {
+  const router = useRouter();
+  
+  const tabs: TabItem[] = [
+    { id: 'scripts', label: 'Scripts', permission: 'scripts' },
+    { id: 'analytics', label: 'Analytics', permission: 'scripts' },
+    { id: 'logs', label: 'Logs', permission: 'logs' },
+    { id: 'telephony', label: 'Telephony Status', permission: 'scripts' },
+    { id: 'users', label: 'Users', permission: 'users' }
+  ];
+
+ const handleTabClick = (tab: TabItem) => {
+  // Store current user before navigation to ensure it persists
+  const currentUser = sessionStorage.getItem('currentUser');
+  if (!currentUser) {
+    window.location.href = '/';
+    return;
+  }
+
+  if (tab.id === 'scripts') {
+    window.location.href = '/scripts';
+  } else {
+    window.location.href = `/?tab=${tab.id}`;
+  }
+};
+
+  // Determine active tab based on current route
+  const getActiveTab = () => {
+    if (router.pathname.startsWith('/scripts')) {
+      return 'scripts';
+    }
+    return activeTab;
+  };
+
+  return (
+    <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-8 w-fit">
+      {tabs.map((tab) => 
+        canAccess(tab.permission) && (
+          <button
+            key={tab.id}
+            onClick={() => handleTabClick(tab)}
+            className={`px-6 py-2 rounded-md font-medium transition-colors ${
+              getActiveTab() === tab.id
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            }`}
+          >
+            {tab.label}
+          </button>
+        )
+      )}
+    </div>
+  );
+};
+
+export default Navigation;

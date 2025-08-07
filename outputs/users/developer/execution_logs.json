@@ -1,0 +1,34 @@
+{
+  "2": [
+    {
+      "timestamp": "2025-08-02T23:24:31.823045",
+      "status": "error",
+      "message": "Script executed with errors",
+      "files": [],
+      "output": "STDOUT:\nError: COUNTRY environment variable is required\nPlease select a country from the dropdown in the UI\n\n\nSTDERR:\n"
+    },
+    {
+      "timestamp": "2025-08-03T00:06:07.709413",
+      "status": "success",
+      "message": "Script executed successfully",
+      "files": [],
+      "output": "STDOUT:\nFetching phone numbers for Brunei...\nFound 1 phone numbers for Brunei\n[\n  {\n    \"number\": \"+673 270 4038\",\n    \"country\": \"BRN\",\n    \"languages\": [\n      \"en\",\n      \"en-001\",\n      \"en-AU\",\n      \"ms-BN\"\n    ],\n    \"brand\": \"Regus\"\n  }\n]\n\n### TABLE_OUTPUT_BEGIN ###\n\u2552\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2564\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2564\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2564\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2555\n\u2502 Number        \u2502 Country   \u2502 Language                 \u2502 Brand   \u2502\n\u255e\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u256a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u256a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u256a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2561\n\u2502 +673 270 4038 \u2502 BRN       \u2502 en, en-001, en-AU, ms-BN \u2502 Regus   \u2502\n\u2558\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2567\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2567\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2567\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255b\n### TABLE_OUTPUT_END ###\n\n\n\nSTDERR:\n"
+    },
+    {
+      "timestamp": "2025-08-03T00:06:14.858435",
+      "status": "success",
+      "message": "Script executed successfully",
+      "files": [],
+      "output": "STDOUT:\nFetching phone numbers for Denmark...\nFound 2 phone numbers for Denmark\n[\n  {\n    \"number\": \"+45 78 74 98 98\",\n    \"country\": \"DNK\",\n    \"languages\": [\n      \"da-DK\",\n      \"en-GB\"\n    ],\n    \"brand\": \"Spacesworks\"\n  },\n  {\n    \"number\": \"+45 78 15 03 46\",\n    \"country\": \"DNK\",\n    \"languages\": [\n      \"da-DK\",\n      \"en-GB\"\n    ],\n    \"brand\": \"Regus\"\n  }\n]\n\n### TABLE_OUTPUT_BEGIN ###\n\u2552\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2564\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2564\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2564\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2555\n\u2502 Number          \u2502 Country   \u2502 Language     \u2502 Brand       \u2502\n\u255e\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u256a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u256a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u256a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2561\n\u2502 +45 78 74 98 98 \u2502 DNK       \u2502 da-DK, en-GB \u2502 Spacesworks \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 +45 78 15 03 46 \u2502 DNK       \u2502 da-DK, en-GB \u2502 Regus       \u2502\n\u2558\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2567\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2567\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2567\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255b\n### TABLE_OUTPUT_END ###\n\n\n\nSTDERR:\n"
+    }
+  ],
+  "5": [
+    {
+      "timestamp": "2025-08-03T00:06:32.834533",
+      "status": "success",
+      "message": "Script executed successfully",
+      "files": [],
+      "output": "STDOUT:\nRunning daily_stats.sql...\n92,236,231,0,5\n\n(1 rows affected)\nRunning daily_summary.sql...\nJordan,red,+96262000543,2025-07-31 10:05:02.5200000 +00:00,CallStream,Website\nNew Zealand,red,+6498849801,2025-07-31 12:18:02.7700000 +00:00,Giacom PSTN,Instant\nPeru,red,+5116429286,2025-08-01 20:22:01.5566667 +00:00,DWSPSTN,Website\nPeru,red,+5116429285,2025-08-01 20:22:01.5566667 +00:00,DWSPSTN,Website\nTunisia,red,+21670022677,2025-07-25 09:05:02.7033333 +00:00,CallStream,Website\n\n(5 rows affected)\nCalculating system health...\n\nTotal Phone Numbers: 236\nOperational: 231\nDegraded: 0\nOffline: 5\nSystem Health: 97% - Operational\n\nHealth Summary (JSON):\n{\n  \"total_phones\": 236,\n  \"operational\": 231,\n  \"degraded\": 0,\n  \"offline\": 5,\n  \"health_percent\": 97,\n  \"status\": \"Operational\"\n}\n\n\nSTDERR:\n"
+    }
+  ]
+}
