@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Eye, EyeOff } from 'lucide-react';
+import { Shield, Eye, EyeOff, HeartHandshake } from 'lucide-react';
 import { LoginCredentials } from '../../types/auth';
 
 interface LoginFormProps {
@@ -30,10 +30,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, isLoading = false }) => 
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-8 h-8 text-blue-600" />
+            <HeartHandshake className="w-8 h-8 text-blue-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Script Manager</h1>
-          <p className="text-gray-600 mt-2">Sign in to manage server scripts</p>
+          <h1 className="text-2xl font-bold text-gray-900">Health Manager</h1>
+          <p className="text-gray-600 mt-2">Sign in </p>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
