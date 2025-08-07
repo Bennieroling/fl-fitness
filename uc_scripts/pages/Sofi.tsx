@@ -4,32 +4,60 @@ import MainLayout from '../components/layout/MainLayout';
 import { User } from '../types/auth';
 import LoginForm from '../components/auth/LoginForm';
 
-const SofiPage: React.FC = () => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [weeklyTarget, setWeeklyTarget] = useState<number>(14000); // Default 2000 cal/day * 7 days
-const [selectedDay, setSelectedDay] = useState<Date | null>(null);
-const [dayData, setDayData] = useState<any>(null);
-  
+interface SofiPageProps {
+  currentUser?: User;
+  onTabChange?: (tab: string) => void;
+  onRefresh?: () => void;
+  onLogout?: () => void;
+}
 
-  // Auth logic (same pattern as your other pages)
+const SofiPage: React.FC<SofiPageProps> = ({ 
+  currentUser: propCurrentUser,
+  onTabChange,
+  onRefresh,
+  onLogout 
+}) => {
+  const [currentUser, setCurrentUser] = useState<User | null>(propCurrentUser || null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(!propCurrentUser);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [weeklyTarget, setWeeklyTarget] = useState<number>(14000);
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [dayData, setDayData] = useState<any>(null);
+
+  // Mock users - same as your script_manager
+  const users: User[] = [
+    { id: 1, username: 'admin', role: 'admin', permissions: ['scripts', 'users', 'logs'] },
+    { id: 2, username: 'developer', role: 'developer', permissions: ['scripts', 'logs'] },
+    { id: 3, username: 'viewer', role: 'viewer', permissions: ['logs'] }
+  ];
+
+  // Auth logic - only run if no user passed as prop
   useEffect(() => {
-    const storedUser = sessionStorage.getItem('currentUser');
-    if (storedUser && !currentUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        setCurrentUser(user);
-      } catch (error) {
-        console.error('Failed to parse stored user:', error);
-        sessionStorage.removeItem('currentUser');
+    if (!propCurrentUser) {
+      const storedUser = sessionStorage.getItem('currentUser');
+      if (storedUser && !currentUser) {
+        try {
+          const user = JSON.parse(storedUser);
+          setCurrentUser(user);
+        } catch (error) {
+          console.error('Failed to parse stored user:', error);
+          sessionStorage.removeItem('currentUser');
+        }
       }
+      setIsLoadingAuth(false);
     }
-    setIsLoadingAuth(false);
-  }, [currentUser]);
+  }, [currentUser, propCurrentUser]);
 
   const canAccess = (permission: string) => {
     return currentUser?.permissions.includes(permission) || false;
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    sessionStorage.removeItem('currentUser');
+    if (onLogout) {
+      onLogout();
+    }
   };
 
   if (isLoadingAuth) {
@@ -41,6 +69,7 @@ const [dayData, setDayData] = useState<any>(null);
   }
 
   return (
+  
     
       <div className="space-y-6">
         {/* Weekly Target Section - Mobile responsive */}

@@ -232,10 +232,14 @@ if (!currentUser) {
     currentUser={currentUser}
   />
 )}
-{/* Sofi Tab */}
+
+{/*Sofi Tab*/}
 {activeTab === 'sofi' && canAccess('scripts') && (
   <SofiPage 
     currentUser={currentUser}
+    onTabChange={setActiveTab}
+    onRefresh={fetchHistoricalLogs}
+    onLogout={handleLogout}
   />
 )}
           
