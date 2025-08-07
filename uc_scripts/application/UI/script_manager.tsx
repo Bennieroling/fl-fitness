@@ -14,6 +14,11 @@ import { User, LoginCredentials } from '../../types/auth';
 import { LogEntry } from '../../types/script';
 import { useRouter } from 'next/router';
 import ExecutionAnalytics from '../../components/analytics/ExecutionAnalytics';
+import NutritionDashboard from '../../pages/NutritionDashboard';
+import ProfileDashboard from '../../pages/ProfileDashboard';
+import DataDashboard from '../../pages/DataDashboard';
+import WorkoutDashboard from '../../pages/WorkoutDashboard';
+import SofiPage from '../../pages/Sofi';
 
 
 // API base URL
@@ -207,174 +212,37 @@ if (!currentUser) {
     onLogout={handleLogout}
     canAccess={canAccess}
   >
-      {/* Logs Tab */}
-      {activeTab === 'logs' && canAccess('logs') && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Script Execution Logs</h2>            
-          </div>
-          <div className="p-6">
-            {Object.keys(scriptLogs).length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Terminal className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>No logs available. Run some scripts to see execution history.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {Object.entries(scriptLogs).map(([scriptId, logs]) => {
-                  return (
-                    <div key={scriptId} className="border border-gray-200 rounded-lg">
-                      <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                        <h3 className="font-medium text-gray-900">{getScriptNameById(scriptId)}</h3>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        {(logs as LogEntry[]).slice(-10).map((log, index) => (
-                          <div key={index} className="space-y-2">
-                            <div className="flex items-start space-x-3 text-sm">
-                              {getStatusIcon(log.status)}
-                              <div className="flex-1">
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-gray-900">{log.message}</span>
-                                </div>
-                                <span className="text-gray-500 text-xs">{log.timestamp}</span>
-                              </div>
-                            </div>
-                            {log.files && log.files.length > 0 && (
-                              <div className="ml-7 p-2 bg-gray-50 rounded-lg">
-                                <p className="text-xs font-medium text-gray-700 mb-2">Generated Files:</p>
-                                <div className="space-y-1">
-                                  {log.files.map((file: any, fileIndex: number) => (
-                                    <div key={fileIndex} className="flex items-center justify-between">
-                                      <span className="text-xs text-gray-600">{file.name}</span>
-                                      <button
-                                        onClick={() => downloadFile(file.name, file.path)}
-                                        className="text-xs text-blue-600 hover:text-blue-800"
-                                      >
-                                        Download
-                                      </button>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                            {log.output && (
-                              <div className="ml-7 bg-gray-900 text-green-400 p-2 rounded text-xs font-mono max-h-32 overflow-y-auto whitespace-pre-wrap">
-                                {log.output.slice(0, 500)}{log.output.length > 500 ? '...' : ''}
-                                
-                                {log.output.includes('+') && log.output.includes('|') && log.output.includes('=') && (
-                                  <div className="mt-2">
-                                    <button
-                                      className="text-xs text-blue-400 hover:text-blue-300 flex items-center space-x-1"
-                                      onClick={() => {
-                                        const win = window.open('', '_blank');
-                                        if (win) {
-                                          win.document.write(`
-                                            <html>
-                                              <head>
-                                                <title>Table Output</title>
-                                                <style>
-                                                  body { font-family: Arial, sans-serif; padding: 20px; }
-                                                  .table-container { overflow-x: auto; margin-top: 20px; }
-                                                  table { border-collapse: collapse; width: 100%; }
-                                                  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                                                  tr:nth-child(even) { background-color: #f2f2f2; }
-                                                  th { background-color: #4CAF50; color: white; }
-                                                </style>
-                                              </head>
-                                              <body>
-                                                <h2>Table Output</h2>
-                                                <pre>${log.output}</pre>
-                                              </body>
-                                            </html>
-                                          `);
-                                          win.document.close();
-                                        }
-                                      }}
-                                    >
-                                      <Table className="w-3 h-3" />
-                                      <span>View as Table</span>
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Telephony Status Tab */}
-      {activeTab === 'telephony' && canAccess('scripts') && (
-        <TelephonyStatusDashboard currentUser={currentUser} API_BASE_URL={API_BASE_URL} />
-      )}
-
-      {/* Users Tab */}
-      {activeTab === 'users' && canAccess('users') && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">User Management</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permissions</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {users.map(user => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-600">
-                            {user.username.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">{user.username}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                        user.role === 'developer' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.permissions.join(', ')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                      <button className="text-red-600 hover:text-red-900">Remove</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-      {/* Analytics Tab */}
-{activeTab === 'analytics' && canAccess('scripts') && (
-  <ExecutionAnalytics 
+      {/* Profile Tab */}
+{activeTab === 'profile' && canAccess('users') && (
+  <ProfileDashboard 
     currentUser={currentUser}
-    scriptLogs={scriptLogs}
-    scripts={scripts}
+  />
+)}
+
+{/* Data Tab */}
+{activeTab === 'data' && canAccess('scripts') && (
+  <DataDashboard 
+    currentUser={currentUser}
+  />
+)}
+
+{/* Workouts Tab */}
+{activeTab === 'workouts' && canAccess('scripts') && (
+  <WorkoutDashboard 
+    currentUser={currentUser}
+  />
+)}
+{/* Sofi Tab */}
+{activeTab === 'sofi' && canAccess('scripts') && (
+  <SofiPage 
+    currentUser={currentUser}
+  />
+)}
+          
+{/* Nutrition Tab */}
+{activeTab === 'nutrition' && canAccess('scripts') && (
+  <NutritionDashboard 
+    currentUser={currentUser}
   />
 )}
     </MainLayout>

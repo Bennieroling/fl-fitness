@@ -30,15 +30,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         onLogout={onLogout}
       />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Navigation 
-          activeTab={activeTab}
-          onTabChange={onTabChange}
-          canAccess={canAccess}
-        />
-        
-        {children}
-      </div>
+<div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+  <div className="relative z-10"> {/* Add z-index to ensure proper stacking */}
+    <Navigation 
+      activeTab={activeTab}
+      onTabChange={onTabChange}
+      canAccess={canAccess}
+    />
+    
+    {children}
+  </div>
+</div>
     </div>
   );
 };
