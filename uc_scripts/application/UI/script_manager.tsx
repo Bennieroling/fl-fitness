@@ -18,7 +18,7 @@ import NutritionDashboard from '../../pages/NutritionDashboard';
 import ProfileDashboard from '../../pages/ProfileDashboard';
 import DataDashboard from '../../pages/DataDashboard';
 import WorkoutDashboard from '../../pages/WorkoutDashboard';
-import SofiPage from '../../pages/Sofi';
+import SofiContent from '../../components/sofi/SofiContent';
 
 
 // API base URL
@@ -45,10 +45,19 @@ const [scripts, setScripts] = useState<any[]>([]);
   ];
 
 useEffect(() => {
-  if (initialTab && initialTab !== 'sofi') {
+  if (initialTab && initialTab !== activeTab && !initialTab.includes('/')) {
     setActiveTab(initialTab);
   }
 }, [initialTab]);
+
+useEffect(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabFromUrl = urlParams.get('tab');
+  
+  if (tabFromUrl && tabFromUrl !== activeTab) {
+    setActiveTab(tabFromUrl); // This should be just "sofi", not "/?tab=sofi"
+  }
+}, []);
 
 useEffect(() => {
   if (currentUser) {
@@ -212,6 +221,15 @@ if (!currentUser) {
     onLogout={handleLogout}
     canAccess={canAccess}
   >
+     {/* DEBUG INFO - Add this at the very top
+    <div style={{background: 'yellow', padding: '10px', margin: '10px'}}>
+      <h3>DEBUG INFO:</h3>
+      <p>Current activeTab: "{activeTab}"</p>
+      <p>initialTab prop: "{initialTab}"</p>
+      <p>URL search: "{window.location.search}"</p>
+      <p>Can access scripts: {canAccess('scripts').toString()}</p>
+      <p>Condition result: {(activeTab === 'sofi' && canAccess('scripts')).toString()}</p>
+    </div> */}
       {/* Profile Tab */}
 {activeTab === 'profile' && canAccess('users') && (
   <ProfileDashboard 
@@ -235,12 +253,7 @@ if (!currentUser) {
 
 {/*Sofi Tab*/}
 {activeTab === 'sofi' && canAccess('scripts') && (
-  <SofiPage 
-    currentUser={currentUser}
-    onTabChange={setActiveTab}
-    onRefresh={fetchHistoricalLogs}
-    onLogout={handleLogout}
-  />
+  <SofiContent currentUser={currentUser} />
 )}
           
 {/* Nutrition Tab */}
