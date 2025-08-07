@@ -31,7 +31,7 @@ interface ScriptManagerUIProps {
 const ScriptManagerUI: React.FC<ScriptManagerUIProps> = ({ initialTab }) => {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [activeTab, setActiveTab] = useState(initialTab || 'scripts');
+  const [activeTab, setActiveTab] = useState(initialTab || '/?tab=Sofi');
   const [scriptLogs, setScriptLogs] = useState<{[key: number]: LogEntry[]}>({});
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 const [scripts, setScripts] = useState<any[]>([]);
@@ -122,7 +122,7 @@ useEffect(() => {
     // Store user in sessionStorage for the script pages
     sessionStorage.setItem('currentUser', JSON.stringify(user));
     // Immediately redirect to scripts page
-    router.push('/scripts');
+    router.push('/?tab=Sofi');
     return true;
   } else {
     
@@ -133,7 +133,7 @@ useEffect(() => {
 
   const handleLogout = () => {
   setCurrentUser(null);
-  setActiveTab('scripts');
+  setActiveTab('/?tab=Sofi');
   setScriptLogs({});
   sessionStorage.removeItem('currentUser');
 };
