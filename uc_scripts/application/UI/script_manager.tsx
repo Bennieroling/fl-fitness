@@ -31,7 +31,7 @@ interface ScriptManagerUIProps {
 const ScriptManagerUI: React.FC<ScriptManagerUIProps> = ({ initialTab }) => {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [activeTab, setActiveTab] = useState(initialTab || '/?tab=Sofi');
+  const [activeTab, setActiveTab] = useState(initialTab || '/?tab=sofi');
   const [scriptLogs, setScriptLogs] = useState<{[key: number]: LogEntry[]}>({});
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 const [scripts, setScripts] = useState<any[]>([]);
@@ -45,7 +45,7 @@ const [scripts, setScripts] = useState<any[]>([]);
   ];
 
 useEffect(() => {
-  if (initialTab && initialTab !== 'scripts') {
+  if (initialTab && initialTab !== 'sofi') {
     setActiveTab(initialTab);
   }
 }, [initialTab]);
@@ -122,7 +122,7 @@ useEffect(() => {
     // Store user in sessionStorage for the script pages
     sessionStorage.setItem('currentUser', JSON.stringify(user));
     // Immediately redirect to scripts page
-    router.push('/?tab=Sofi');
+    router.push('/?tab=sofi');
     return true;
   } else {
     
@@ -133,7 +133,7 @@ useEffect(() => {
 
   const handleLogout = () => {
   setCurrentUser(null);
-  setActiveTab('/?tab=Sofi');
+  setActiveTab('/?tab=sofi');
   setScriptLogs({});
   sessionStorage.removeItem('currentUser');
 };

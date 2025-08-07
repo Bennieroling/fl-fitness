@@ -8,9 +8,9 @@ export default function Home() {
 
   // If user is trying to access scripts, redirect to the new scripts page
   useEffect(() => {
-    if (tab === 'sofi') {
-      router.replace('/sofi');
-    }
+    // if (tab === 'sofi') {
+    //   router.replace('/sofi');
+    // }
   }, [tab, router]);
 
   return <ScriptManagerUI initialTab={tab as string} />;

@@ -33,7 +33,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange, canAcce
   }
 
   if (tab.id === 'sofi') {
-    window.location.href = '/sofi';
+    window.location.href = '/?tab=sofi';
   } else {
     window.location.href = `/?tab=${tab.id}`;
   }
@@ -41,7 +41,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange, canAcce
 
   // Determine active tab based on current route
   const getActiveTab = () => {
-    if (router.pathname.startsWith('/sofi')) {
+    if (router.pathname.startsWith('/?tab=sofi')) {
       return 'sofi';
     }
     return activeTab;
