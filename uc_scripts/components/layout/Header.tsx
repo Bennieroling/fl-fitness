@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onRefresh, onLogout }) => 
             <div className="bg-blue-100 w-10 h-10 rounded-lg flex items-center justify-center">
               <HeartHandshake className="w-6 h-6 text-blue-600" />
             </div>
-            <h1 className="text-xl font-semibold text-gray-900">Health Manager</h1>
+            <h1 className="text-xl font-semibold text-gray-900">Health Manager - the apple rule</h1>
           </div>
           
           <div className="flex items-center space-x-4">

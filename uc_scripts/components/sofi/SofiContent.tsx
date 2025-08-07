@@ -14,8 +14,10 @@ const SofiContent: React.FC<SofiContentProps> = ({ currentUser }) => {
 
   return (
     <div className="space-y-6">
+        
   {/* Weekly Target Section - Mobile responsive */}
  <div className="bg-white p-3 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+    
    <div className="flex items-center justify-between mb-3 sm:mb-4">
      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center">
        <Target className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" />
