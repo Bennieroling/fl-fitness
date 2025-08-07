@@ -8,8 +8,8 @@ export default function Home() {
 
   // If user is trying to access scripts, redirect to the new scripts page
   useEffect(() => {
-    if (tab === 'scripts') {
-      router.replace('/scripts');
+    if (tab === 'sofi') {
+      router.replace('/sofi');
     }
   }, [tab, router]);
 
