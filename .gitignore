@@ -1,0 +1,5 @@
+node_modules/
+.next/
+dist/
+uc_scripts/node_modules/
+uc_scripts/.next/
